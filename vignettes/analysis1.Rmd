@@ -12,12 +12,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Install package
 
-Run the below code if R package hasn't already been installed:
+Run the below code if you would like to re-run the following analyses using R.
 
-```{r}
+```{r message=FALSE}
 
 # Run the following code to install package 
 # remotes::install_github("https://github.com/hgriesbauer/pliDrought2019")
+
+# Load libraries
 library(pliDrought2019)
 library(dplyr)
 library(ggplot2)
@@ -39,6 +41,18 @@ In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2`
 6. Both trees were free of visible forest health factors (some trees with stem disease were sampled).
 
 ## Preliminary analysis
+
+### Tree-level measurements
+For each tree, we collected the following measurements:
+
+1. Tree # - Tree #1 is always the dead tree, Tree #2 is live
+2. Distance to live partner - Distance between trees in plot, m
+3. Crown class - Dominant or codominant trees were sampled
+4. Crown volume - This compares volume between live and dead trees within a plot.  Live tree crown was assigned a volume of 100%, and the dead tree % is relative to live crown percentage.  E.g., a dead tree crown volume % of 50% means its crown volume (when alive) would have been 1/2 of the live tree.
+5. Longest branch - Ocular estimate of longest branch within crown, cm
+6. B - Height to bottom of crown (in case of dead trees, where live crown was),m
+7. Percentage of live needles - Percentage of live needles to dead needles in crown
+
 ```{r}
 
 # BOXPLOTS
@@ -48,10 +62,28 @@ pliDat %>%
                 `Height (m)`,`DBH (cm)`,`B (m)`,`% live needles`) %>% 
   pivot_longer(cols=4:9,names_to="var") %>% 
   mutate(`Tree status`=factor(`Tree #`,labels=c("Dead","Live"))) %>% 
-  ggplot(aes(y=`value`,x=`Tree status`))+
+  ggplot(aes(y=`value`,x=`Tree status`,fill=`Tree status`))+
   geom_boxplot()+
-  facet_wrap(~var,scales="free_y")
+  facet_wrap(~var,scales="free_y")+
+  theme_bw()
 
 ```
+
+Some differences from these boxplots:
+1. Height to live crown (B) looks to be higher in live trees;
+2. DBH is higher in live trees (this seems intuitive, given that the trees have been growing, whereas dead trees may have stopped growing 2 years ago);
+3. Live trees have longer crown branches than dead trees.
+
+Heights seems to be relatively equal between live/dead trees.
+
+The % live needles and % crown volume differences seem intuitive.
+
+
+### Cores
+We also collected a single tree core from each tree, at 1.3m off the ground.  Dr. Lisa Wood at UNBC is processing the cores in fall 2019 and will provide annual measures of:
+1. Ring density (g/cm3)
+2. Earlywood and Latewood density
+3. Ring width (mm)
+5. Earlywood and Latewood width (mm)
 
 
