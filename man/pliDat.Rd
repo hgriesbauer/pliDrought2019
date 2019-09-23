@@ -19,6 +19,6 @@
 data(pliDat)
 }
 \description{
-Lodgepole pine mortality data
+We collected pine mortality data in summer 2019 from four sites.
 }
 \keyword{datasets}
