@@ -1,3 +1,11 @@
 Package: pliDrought2019
-Version: 0.1
 RoxygenNote: 6.1.1
+Package: mypackage
+Title: Data and functions to analyze Pli drought mortality data 
+Version: 0.1
+Authors@R: person("Hardy", "Griesbauer", email = "hardy.griesbauer@gov.bc.ca",
+                  role = c("aut", "cre"))
+Description: Package contains data collected in drought-impacted lodgepole pine-leading stands in the Okanagan.
+Depends: R (>= 3.1.0)
+License: What license is it under?
+LazyData: true
