@@ -78,6 +78,60 @@ Heights seems to be relatively equal between live/dead trees.
 
 The % live needles and % crown volume differences seem intuitive.
 
+with boxplots, we lose the paired differences.  Let's look at that next.
+
+### Within-plot differences
+We can look at differences between live and dead trees within each plot. 
+
+First, we'll define a function to take a measurement (e.g., longest branch in the crown) and estimate differences between each tree pair, using a paired-sample t-test.
+
+```{r}
+
+#define treeDiff function
+treeDiff<-function(y) {# y is the column name of interest
+
+  x<-
+  pliDat %>% 
+  dplyr::select(`Opening`,`Plot`,`Tree #`,y) %>% 
+  pivot_wider(names_from=`Tree #`,values_from=y) %>% 
+  setNames(c("Opening","Plot","Dead","Live"))
+
+  return(t.test(x$Dead,x$Live,paired = TRUE))
+  
+}
+
+
+```
+
+#### Longest branch in the crown
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Longest Branch (cm)")$estimate`.  
+
+```{r}
+treeDiff(y="Longest Branch (cm)")
+```
+
+#### Does DBH differ between live and dead trees within each plot?
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="DBH (cm)")$estimate`.  Result is significant.
+
+```{r}
+treeDiff(y="DBH (cm)")
+```
+
+#### Does height to live crown differ between live and dead trees within each plot?
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Height (m)")$estimate`.  Result is significant.
+
+```{r}
+treeDiff(y="B (m)")
+```
+
+#### Does tree height differ between live and dead trees within each plot?
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Height (m)")$estimate`.  Tree heights did not significantly differ within each plot.
+
+```{r}
+treeDiff(y="Height (m)")
+```
+
+
 
 ### Cores
 We also collected a single tree core from each tree, at 1.3m off the ground.  Dr. Lisa Wood at UNBC is processing the cores in fall 2019 and will provide annual measures of:
