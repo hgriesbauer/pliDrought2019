@@ -7,27 +7,51 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
-## R Markdown
+## Install package
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Run the below code if R package hasn't already been installed:
 
 ```{r}
 
-
-
+# Run the following code to install package 
+# remotes::install_github("https://github.com/hgriesbauer/pliDrought2019")
+library(pliDrought2019)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 
 ```
 
-## Including Plots
+## Data description
 
-You can also embed plots, for example:
+Thanks Rachel for your great notes and summaries!
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2` paired plots, distributed over `r length(unique(pliDat$Opening))`.  Each plot contained one dead pine tree, with drought as the likely mortality agent, and one live tree.  The following criteria were used to identify tree pairs:
+
+1. Dead tree was determined to have been killed by drought within past two years;
+2. Dead tree had <=20% live needles (in other words, 80+% of needles on tree were red/dead);
+3. Live tree had >=80% live needles;
+4. Both trees had a similar microtopographic position;
+5. Both trees had similar diameter, height, crown class;and
+6. Both trees were free of visible forest health factors (some trees with stem disease were sampled).
+
+## Preliminary analysis
+```{r}
+
+# BOXPLOTS
+pliDat %>% 
+  dplyr::select(`Opening`,`Plot`,`Tree #`,
+                `Crown Volume (%)`,`Longest Branch (cm)`,
+                `Height (m)`,`DBH (cm)`,`B (m)`,`% live needles`) %>% 
+  pivot_longer(cols=4:9,names_to="var") %>% 
+  mutate(`Tree status`=factor(`Tree #`,labels=c("Dead","Live"))) %>% 
+  ggplot(aes(y=`value`,x=`Tree status`))+
+  geom_boxplot()+
+  facet_wrap(~var,scales="free_y")
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
