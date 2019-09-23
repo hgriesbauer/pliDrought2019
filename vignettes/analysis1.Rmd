@@ -40,8 +40,6 @@ In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2`
 5. Both trees had similar diameter, height, crown class;and
 6. Both trees were free of visible forest health factors (some trees with stem disease were sampled).
 
-## Preliminary analysis
-
 ### Tree-level measurements
 For each tree, we collected the following measurements:
 
@@ -52,6 +50,9 @@ For each tree, we collected the following measurements:
 5. Longest branch - Ocular estimate of longest branch within crown, cm
 6. B - Height to bottom of crown (in case of dead trees, where live crown was),m
 7. Percentage of live needles - Percentage of live needles to dead needles in crown
+
+## Preliminary analysis
+Below is R code to generate some preliminary analyses of tree measurements.
 
 ```{r}
 
