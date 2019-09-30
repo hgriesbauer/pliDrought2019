@@ -1,37 +1,23 @@
 ---
-title: "Pli drought mortality"
+title: "Pli drought mortality prelim report"
 author: "Hardy Griesbauer"
 date: "20/09/2019"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-```
-
-## Install package
-
-Run the below code if you would like to re-run the following analyses using R.
-
-```{r message=FALSE}
-
-# Run the following code to install package 
-# remotes::install_github("https://github.com/hgriesbauer/pliDrought2019")
-
-# Load libraries
 library(pliDrought2019)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
 
 ```
 
 ## Data description
 
-Thanks Rachel for your great notes and summaries!
+*Thanks Rachel for your great notes and summaries!*
 
-In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2` paired plots, distributed over `r length(unique(pliDat$Opening))`.  Each plot contained one dead pine tree, with drought as the likely mortality agent, and one live tree.  The following criteria were used to identify tree pairs:
+In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2` paired plots, distributed over `r length(unique(pliDat$Opening))` openings.  Each plot contained one dead pine tree, with drought as the likely mortality agent, and one live tree.  The following criteria were used to identify tree pairs:
 
 1. Dead tree was determined to have been killed by drought within past two years;
 2. Dead tree had <=20% live needles (in other words, 80+% of needles on tree were red/dead);
@@ -39,6 +25,8 @@ In July 2019, we sampled data from `r nrow(pliDat)` trees, in `r nrow(pliDat)/2`
 4. Both trees had a similar microtopographic position;
 5. Both trees had similar diameter, height, crown class;and
 6. Both trees were free of visible forest health factors (some trees with stem disease were sampled).
+
+Openings were located in the Montane Spruce dry-mild subzone.
 
 ### Tree-level measurements
 For each tree, we collected the following measurements:
@@ -52,9 +40,23 @@ For each tree, we collected the following measurements:
 7. Percentage of live needles - Percentage of live needles to dead needles in crown
 
 ## Preliminary analysis
-Below is R code to generate some preliminary analyses of tree measurements.
+Below is R code to generate some preliminary analyses of tree measurements.  If you'd like to re-run the R code below, use the following scripts to install the data and load relevant libraries.  You may need to install libraries into R.
 
-```{r}
+## Install pine drought mortality data into R
+```{r message=FALSE}
+
+# Run the following code to install package 
+# remotes::install_github("https://github.com/hgriesbauer/pliDrought2019")
+
+# Load libraries
+library(pliDrought2019)
+library(tidyverse)
+
+```
+
+## Boxplots 
+
+```{r, fig.width=8, fig.height=4}
 
 # BOXPLOTS
 pliDat %>% 
@@ -66,13 +68,14 @@ pliDat %>%
   ggplot(aes(y=`value`,x=`Tree status`,fill=`Tree status`))+
   geom_boxplot()+
   facet_wrap(~var,scales="free_y")+
-  theme_bw()
+ theme_bw()
 
 ```
 
 Some differences from these boxplots:
+
 1. Height to live crown (B) looks to be higher in live trees;
-2. DBH is higher in live trees (this seems intuitive, given that the trees have been growing, whereas dead trees may have stopped growing 2 years ago);
+2. DBH is higher in live trees (this seems intuitive, given that the live trees have continued growing, whereas dead trees may have stopped growing 2 years ago);
 3. Live trees have longer crown branches than dead trees.
 
 Heights seems to be relatively equal between live/dead trees.
@@ -104,8 +107,10 @@ treeDiff<-function(y) {# y is the column name of interest
 
 ```
 
+-------------------------------------------
+
 #### Longest branch in the crown
-Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Longest Branch (cm)")$estimate`.  
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Longest Branch (cm)")$estimate`. Result is significant. 
 
 ```{r}
 treeDiff(y="Longest Branch (cm)")
@@ -119,7 +124,7 @@ treeDiff(y="DBH (cm)")
 ```
 
 #### Does height to live crown differ between live and dead trees within each plot?
-Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="Height (m)")$estimate`.  Result is significant.
+Using a paired sample t-test, we see that the average difference within each pair is `r treeDiff(y="B (m)")$estimate`.  Result is significant.
 
 ```{r}
 treeDiff(y="B (m)")
@@ -136,9 +141,11 @@ treeDiff(y="Height (m)")
 
 ### Cores
 We also collected a single tree core from each tree, at 1.3m off the ground.  Dr. Lisa Wood at UNBC is processing the cores in fall 2019 and will provide annual measures of:
+
 1. Ring density (g/cm3)
 2. Earlywood and Latewood density
 3. Ring width (mm)
 5. Earlywood and Latewood width (mm)
 
+We can look into this more once we receive the data from Lisa...
 
