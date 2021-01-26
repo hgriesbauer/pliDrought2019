@@ -1,0 +1,149 @@
+---
+title: "Analysis of ring data"
+author: "Hardy Griesbauer"
+date: "22/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Correlation matrix to look at Pli data
+
+library(tidyverse)
+library(dplR)
+library(corrplot)
+
+source("http://www.sthda.com/upload/rquery_cormat.r")
+
+load("~/Documents/Git/pliDrought2019/data/pliDat.RData")
+
+
+  
+
+```
+
+## Description
+
+Basically I am using correlation analysis to identify patterns between cores in terms of annual ring widths.
+
+```{r}
+
+x<-
+  pliDat$ringData
+
+# Correlation matrix
+x<-
+  pliDat$ringData %>% 
+  filter(Type=="lw") %>% 
+  filter(Tree.Num==2) %>% # filter for live trees
+  mutate(coreID=paste(Opening,coreID,sep="-")) %>% 
+  dplyr::select(coreID,Year,Value) %>% 
+  pivot_wider(names_from=coreID,values_from=Value) %>% 
+  filter(Year>=1990) %>% 
+  column_to_rownames("Year") 
+  # detrend(method="Spline")
+
+x.cor<-
+  rquery.cormat(x,type="flatten", graph=FALSE) %>% 
+  pluck(1) %>% 
+  arrange(desc(cor))
+
+x.list<-
+  c("264-10-2","264-2-2","CarmiB-3-2","264-4-2","CarmiA-1-2",
+    "CarmiB-15-2","48Y-8-2")
+
+x %>% 
+  dplyr::select(x.list) %>% 
+  rownames_to_column("Year") %>% 
+  pivot_longer(-Year,names_to="coreID",values_to="value") %>% 
+  ggplot()+
+  aes(x=Year,y=value,group=coreID,color=coreID)+
+  geom_point()+
+  ylab("Relative ring width")+
+  geom_line()+
+    theme(axis.text.x = element_text(angle=270,vjust=0.4))
+
+
+```
+
+
+## Site level analysis
+
+
+```{r}
+
+site="48Y"
+
+x %>% 
+  dplyr::select(contains(site)) %>% 
+  rownames_to_column("Year") %>%
+  filter(Year>=2010) %>% 
+  pivot_longer(-Year,names_to="coreID",values_to="value") %>% 
+  ggplot()+
+  aes(x=Year,y=value,group=coreID,color=coreID)+
+  geom_point()+
+  ylab("Relative ring width")+
+  geom_line()+
+    theme(axis.text.x = element_text(angle=270,vjust=0.4))
+
+
+```
+
+Short answer is that at the stand-levell, we see almost no correlation between live trees.
+
+Let's look at trees adjacent to each other:
+
+```{r function to plot adjacent trees}
+
+
+plotAdjTrees<-function(site,ringVar="rw") {
+
+  # come up with list to remove trees that lack a pair
+  plotList<-
+    pliDat$ringData %>% 
+    filter(Opening==site) %>% 
+    filter(Type==ringVar) %>% 
+    
+    group_by(Plot) %>% 
+    distinct(Tree.Num) %>% 
+    group_by(Plot) %>% 
+    summarise(Num.Trees=n()) %>% 
+    filter(Num.Trees==2) %>% 
+    pull(Plot)
+  
+  
+  
+    pliDat$ringData %>% 
+    filter(Opening==site) %>% 
+    filter(Type=="lw") %>% 
+    filter(Plot %in% plotList) %>% 
+      
+    mutate(Plot=paste("Plot",":",Plot,sep="")) %>% 
+    mutate(Tree.Num=fct_recode(Tree.Num,Dead="1",Live="2")) %>% 
+      rename(Tree=Tree.Num) %>% 
+    
+    ggplot()+
+    aes(x=Year,y=Value,color=Tree,group=Tree)+
+    geom_point()+
+    geom_line()+
+    facet_wrap(~Plot)+
+      theme(legend.position="bottom",
+            axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=1))
+    
+}
+    
+
+```
+
+# Opening: 48Y
+
+```{r plot some variables for 264}
+
+plotAdjTrees(site="264",ringVar="mxd")+
+  ylab("Maximum ring density (g/cm3)")
+
+
+
+```
+
